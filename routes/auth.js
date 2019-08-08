@@ -3,6 +3,7 @@ const User = require('../model/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const {registrationValidation, loginValidation} = require('../validation/validation')
+const {logger} = require('../logs-winston/login_logs')
 
 router.post('/register', async (req, res) => {
     //Validate data
@@ -25,6 +26,8 @@ router.post('/register', async (req, res) => {
     });
     try{
         const savedUser = await user.save();
+        //Log the registration
+        logger.log('info', `Registered ${user.email}`,);
         res.send({user: user._id});
     }catch(err){
         res.status(400).send(err);
@@ -44,6 +47,9 @@ router.post('/login', async (req, res) => {
     //Password is correct
     const validPassword =  await bcrypt.compare(req.body.password, user.password);
     if(!validPassword) return res.status(400).send('Email or password is wrong!');
+
+    //Log the login
+    logger.log('info', `Logged in ${user.email}`,);
 
     //Create adn assing a token
     const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET);
