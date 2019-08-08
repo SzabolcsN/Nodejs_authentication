@@ -9,7 +9,7 @@ const app  = express();
 
 dotenv.config();
 //Connect to DB
-mongoose.connect(process.env.DB_CONNECT, {useNewUrlParser: true}, () => console.log('Connected to DB!'));
+mongoose.connect(process.env.DB_CONNECT, {useNewUrlParser: true}).catch(error => handleError(error));
 //Middleware
 app.use(express.json());
 app.use('/api/user', authRoute);
