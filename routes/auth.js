@@ -4,15 +4,25 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const {registrationValidation, loginValidation} = require('../validation/validation');
 const {logger} = require('../logs-winston/user-logger');
+const createError = require('http-errors');
 
-router.post('/register', async (req, res) => {
+router.post('/register', async (req, res, next) => {
     //Validate data
     const {error} = registrationValidation(req.body);
-    if(error) return res.status(400).send(error.details[0].message);
+    //if(error) return res.status(400).send(error.details[0].message);
+    if(error){
+        return next(createError(400, error.details[0].message));
+        next();
+    }
 
     //Email check in DB
     const emailExist = await User.findOne({email: req.body.email});
-    if(emailExist) return res.status(400).send('Email already exist!');
+    //if(emailExist) return res.status(400).send('Email already exist!');
+    if(emailExist){
+        return next(createError(400, 'Email already exist!'));
+        next();
+    }
+    
 
     //Hash password
     const salt = await bcrypt.genSalt(10);
@@ -35,18 +45,30 @@ router.post('/register', async (req, res) => {
 });
 
 
-router.post('/login', async (req, res) => {
+router.post('/login', async (req, res, next) => {
     //Validate data
     const {error} = loginValidation(req.body);
-    if(error) return res.status(400).send(error.details[0].message);
+    //if(error) return res.status(400).send(error.details[0].message);
+    if(error){
+        return createError(400, error.details[0].message);
+        next();
+    }
 
     //Email check in DB
     const user = await User.findOne({email: req.body.email});
-    if(!user) return res.status(400).send('Email or password is wrong!');
+    //if(!user) return res.status(400).send('Email or password is wrong!');
+    if(!user){
+        return next(createError(400, 'Email or password is wrong!'));
+        next();
+    }
     
     //Password is correct
     const validPassword =  await bcrypt.compare(req.body.password, user.password);
-    if(!validPassword) return res.status(400).send('Email or password is wrong!');
+    //if(!validPassword) return res.status(400).send('Email or password is wrong!');
+    if(!validPassword){
+        return next(createError(400, 'Email or password is wrong!'));
+        next();
+    }
 
     //Log the login
     logger.log('info', `Logged in ${user.email}`,);
