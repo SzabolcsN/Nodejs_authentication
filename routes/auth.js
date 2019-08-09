@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const {registrationValidation, loginValidation} = require('../validation/validation');
 const {logger} = require('../logs-winston/user-logger');
 const createError = require('http-errors');
+const path = require('path');
 
 router.post('/register', async (req, res, next) => {
     //Validate data
@@ -45,7 +46,7 @@ router.post('/register', async (req, res, next) => {
 });
 
 
-router.post('/login', async (req, res, next) => {
+router.post('/auth', async (req, res, next) => {
     //Validate data
     const {error} = loginValidation(req.body);
     //if(error) return res.status(400).send(error.details[0].message);
@@ -77,5 +78,18 @@ router.post('/login', async (req, res, next) => {
     const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET);
     res.header('auth-token', token).send(token);
 });
+
+router.get('/login', function(req, res) {
+	res.sendFile(path.join(__dirname + '../views/login.html'));
+});
+
+router.get('/registration', function(req, res) {
+	res.sendFile(path.join(__dirname + '../views/registration.html'));
+});
+
+router.get('/posts', function(req, res) {
+	res.sendFile(path.join(__dirname + '../views/posts.html'));
+});
+
 
 module.exports = router;
