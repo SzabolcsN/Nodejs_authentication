@@ -6,6 +6,7 @@ const {registrationValidation, loginValidation} = require('../validation/validat
 const {logger} = require('../logs-winston/user-logger');
 const createError = require('http-errors');
 const path = require('path');
+//const bodyParser = require('body-parser');
 
 router.post('/register', async (req, res, next) => {
     //Validate data
@@ -80,15 +81,15 @@ router.post('/auth', async (req, res, next) => {
 });
 
 router.get('/login', function(req, res) {
-	res.sendFile(path.join(__dirname + '../views/login.html'));
+	res.sendFile(path.join(__dirname + '/../views/login.html'));
 });
 
 router.get('/registration', function(req, res) {
-	res.sendFile(path.join(__dirname + '../views/registration.html'));
+	res.sendFile(path.join(__dirname + '/../views/registration.html'));
 });
 
 router.get('/posts', function(req, res) {
-	res.sendFile(path.join(__dirname + '../views/posts.html'));
+	res.sendFile(path.join(__dirname + '/../views/posts.html'));
 });
 
 
